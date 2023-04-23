@@ -1,58 +1,63 @@
-import {Row, Col, Table, Button} from "react-bootstrap";
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import { Row, Col, Table, Button } from 'react-bootstrap';
 
 function Answers(props) {
-    console.log(props.answers);
     return (
-        <div>
+        <>
             <Row>
-                <Col as="h2">
-                    Answers:
+                <Col as="h2">Answers:</Col>
+            </Row>
+            <Row>
+                <Col lg={10} className="mx-auto">
+                    <AnswerTable answers={props.answers}></AnswerTable>
                 </Col>
             </Row>
-            <Row>
-                <AnswrTable answers={props.answers}>
-
-                </AnswrTable>
-            </Row>
-        </div>
+        </>
     );
 }
 
-function AnswrTable(props) {
+function AnswerTable(props) {
     return (
-        <Table striped bordered hover>
+        <Table striped>
             <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Text</th>
-                    <th>Author</th>
-                    <th>Score</th>
-                    <th>Actions</th>
-                </tr>
+            <tr>
+                <th>Date</th>
+                <th>Text</th>
+                <th>Author</th>
+                <th>Score</th>
+                <th>Actions</th>
+            </tr>
             </thead>
             <tbody>
-            {props.answers.map((ans) =>
-                <AnswerRow answer={ans} key={ans.id} >
-                </AnswerRow>)
+            {
+                props.answers.map((ans) => <AnswerRow answer={ans} key={ans.id} />)
             }
             </tbody>
         </Table>
-
     );
 }
 
 function AnswerRow(props) {
-    return (
-        <tr>
+    return(
+        <tr><AnswerData answer={props.answer}/><AnswerActions /></tr>
+    );
+}
+
+function AnswerData(props) {
+    return(
+        <>
             <td>{props.answer.date.format('YYYY-MM-DD')}</td>
             <td>{props.answer.text}</td>
             <td>{props.answer.name}</td>
             <td>{props.answer.score}</td>
-            <td>
-                <Button variant="primary">Upvote</Button>
-            </td>
-        </tr>
+        </>
     );
+}
+
+function AnswerActions() {
+    return <td>
+        <Button variant='success'><i className='bi bi-plus'></i></Button>
+    </td>
 }
 
 export { Answers };

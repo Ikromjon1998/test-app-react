@@ -1,26 +1,26 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container } from 'react-bootstrap'
-import './App.css'
-import Question from './QAModels'
-import { Answers } from './components/AnswerComponents.jsx'
+import Question from './QAModels';
+import { Container, Row } from 'react-bootstrap';
+import { Answers } from './components/AnswerComponents';
+import NavHeader from './components/NavbarComponents';
+import QuestionDescription from './components/QuestionComponents';
+import './App.css';
 
-const fakeData = new Question(
-  1, 
-  'Is JavaScript a programming language?', 
-  'Ikromjon Ochilov ', 
-  '2023-04-21'
-);
-fakeData.init();
+const fakeQuestion = new Question(1, 'Is JavaScript better than Python?', 'Luigi De Russis', '2023-02-07');
+fakeQuestion.init();
 
 function App() {
 
-  return (
-    <div className="App">
-      <Container>
-        <Answers answers={fakeData.getAnswers()} />
-      </Container>
-    </div>
-  )
+    return (
+        <div className="App">
+            <NavHeader questionNum={fakeQuestion.id} />
+            <Container fluid className="mt-3">
+                <QuestionDescription question={fakeQuestion} />
+                <Answers answers={fakeQuestion.getAnswers()}></Answers>
+            </Container>
+        </div>
+
+    )
 }
 
-export default App
+export default App;
