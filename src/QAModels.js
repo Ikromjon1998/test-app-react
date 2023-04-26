@@ -34,4 +34,4 @@ function Question(id, text, author, date) {
   }
 }
 
-export default Question;
+export { Answer, Question };
