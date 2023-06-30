@@ -1,7 +1,7 @@
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { Row, Col, Table, Button } from "react-bootstrap";
-import AnswerForm from "./AnswerForm";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function Answers(props) {
   return (
@@ -24,9 +24,7 @@ function Answers(props) {
 }
 
 function AnswerTable(props) {
-  const [showForm, setShowForm] = useState(false);
   const [sortOrder, setSortOrder] = useState("none");
-  const [editableAnswer, setEditableAnswer] = useState();
 
   const sortedAnswers = [...props.answers];
   if (sortOrder === "asc") sortedAnswers.sort((a, b) => a.score - b.score);
@@ -66,44 +64,14 @@ function AnswerTable(props) {
         </thead>
         <tbody>
           {sortedAnswers.map((ans) => (
-            <AnswerRow
-              answer={ans}
-              key={ans.id}
-              voteUp={props.voteUp}
-              setShowForm={setShowForm}
-              setEditableAnswer={setEditableAnswer}
-            />
+            <AnswerRow answer={ans} key={ans.id} voteUp={props.voteUp} />
           ))}
         </tbody>
       </Table>
 
-      {/* Assumption: the last id will be in the last item in the array */}
-      {showForm ? (
-        <AnswerForm
-          key={editableAnswer ? editableAnswer.id : -1}
-          lastId={props.answers.slice(-1)[0].id}
-          answer={editableAnswer}
-          addAnswer={(answer) => {
-            props.addAnswer(answer);
-            setShowForm(false);
-          }}
-          cancel={() => setShowForm(false)}
-          updateAnswer={(answer) => {
-            props.updateAnswer(answer);
-            setShowForm(false);
-          }}
-        />
-      ) : (
-        <Button
-          variant="success"
-          onClick={() => {
-            setShowForm(true);
-            setEditableAnswer();
-          }}
-        >
-          Add
-        </Button>
-      )}
+      <Link to="addAnswer" className="btn btn-success" role="button">
+        Add
+      </Link>
     </>
   );
 }
@@ -112,12 +80,7 @@ function AnswerRow(props) {
   return (
     <tr>
       <AnswerData answer={props.answer} />
-      <AnswerActions
-        voteUp={props.voteUp}
-        answer={props.answer}
-        setShowForm={props.setShowForm}
-        setEditableAnswer={props.setEditableAnswer}
-      />
+      <AnswerActions voteUp={props.voteUp} answer={props.answer} />
     </tr>
   );
 }
@@ -136,15 +99,13 @@ function AnswerData(props) {
 function AnswerActions(props) {
   return (
     <td>
-      <Button
-        variant="primary"
-        onClick={() => {
-          props.setShowForm(true);
-          props.setEditableAnswer(props.answer);
-        }}
+      <Link
+        to={`editAnswer/${props.answer.id}`}
+        className="btn btn-primary"
+        state={props.answer.serialize()}
       >
         <i className="bi bi-pencil-square"></i>
-      </Button>
+      </Link>{" "}
       <Button variant="success" onClick={() => props.voteUp(props.answer.id)}>
         <i className="bi bi-arrow-up"></i>
       </Button>

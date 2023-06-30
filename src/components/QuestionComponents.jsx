@@ -1,6 +1,21 @@
 import { Row, Col } from "react-bootstrap";
+import Answers from "./AnswerComponents.jsx";
 
-function QuestionDescription(props) {
+export function SingleQuestion(props) {
+  return (
+    <>
+      <QuestionDescription question={question} />
+      <Answers
+        answers={answers}
+        voteUp={voteUp}
+        addAnswer={addAnswer}
+        updateAnswer={updateAnswer}
+      ></Answers>
+    </>
+  );
+}
+
+export function QuestionDescription(props) {
   return (
     <>
       <Row>
@@ -40,4 +55,4 @@ function QuestionText(props) {
   );
 }
 
-export default QuestionDescription;
+export default { QuestionDescription, SingleQuestion };
