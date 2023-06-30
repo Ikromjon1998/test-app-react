@@ -9,7 +9,6 @@ import QuestionList from "./components/QuestionListComponent";
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 
-// Create some fake questions
 const fakeQuestions = [
   new Question(
     1,
@@ -25,12 +24,11 @@ const fakeQuestions = [
   ),
 ];
 
-// Create some fake answers
 const fakeAnswers = [
   new Answer(1, "Yes", "Luca Mannella", "2023-02-15", 1, -10),
   new Answer(
     2,
-    "Not in a million years",
+    "Not in a million year",
     "Guido van Rossum",
     "2023-03-02",
     1,
@@ -44,19 +42,17 @@ const fakeAnswers = [
     "2023-03-04",
     1
   ),
-  new Answer(5, "85", "Ikromjon Ochilov", "2023-04-01", 2, 34),
 ];
 
 function App() {
   const [questions, setQuestions] = useState(fakeQuestions);
   const [answers, setAnswers] = useState(fakeAnswers);
 
-  // Function to handle voting up an answer
   const voteUp = (answerId) => {
-    setAnswers((oldAnswers) => {
-      return oldAnswers.map((ans) => {
+    setAnswers((oldAnswer) => {
+      return oldAnswer.map((ans) => {
         if (ans.id === answerId) {
-          // Return the "updated" answer with score incremented by 1
+          // return the "updated" answer
           return new Answer(
             ans.id,
             ans.text,
@@ -70,17 +66,14 @@ function App() {
     });
   };
 
-  // Function to add a new answer
   const addAnswer = (answer) => {
     setAnswers((oldAnswers) => [...oldAnswers, answer]);
   };
 
-  // Function to update an existing answer
   const updateAnswer = (answer) => {
-    setAnswers((oldAnswers) => {
-      return oldAnswers.map((ans) => {
+    setAnswers((oldAnswer) => {
+      return oldAnswer.map((ans) => {
         if (ans.id === answer.id) {
-          // Return the updated answer with the new information
           return new Answer(
             answer.id,
             answer.text,
@@ -103,7 +96,7 @@ function App() {
           - /questions/:questionId/addAnswer -> the form to add a new answer
           - /questions/:questionId/editAnswer/:answerId -> the form to update the :answerId answer
           - * -> not found
-        */}
+          */}
         <Route
           element={
             <>
