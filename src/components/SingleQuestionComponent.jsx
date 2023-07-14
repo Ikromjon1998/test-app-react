@@ -1,14 +1,49 @@
 import { Row, Col } from "react-bootstrap";
 import Answers from "./AnswerComponents";
 import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import API from "../API";
+import { Answer } from "../QAModels";
 
 function SingleQuestion(props) {
-  // Get the questionId from the URL to retrieve the right question and its answers
+  // get the questionId from the URL to retrieve the right question and its answers
   const params = useParams();
   const question = props.questions[params.questionId - 1];
-  const answers = props.answers.filter(
-    (ans) => ans.questionId == params.questionId
-  );
+  const [answers, setAnswers] = useState([]);
+
+  const getAnswers = async () => {
+    const answers = await API.getAnswers(params.questionId);
+    setAnswers(answers);
+  };
+
+  useEffect(() => {
+    // get all the answers of this question from API
+    getAnswers();
+  }, []);
+
+  const voteUp = (answerId) => {
+    // temporary update
+    setAnswers((oldAnswer) => {
+      return oldAnswer.map((ans) => {
+        if (ans.id === answerId) {
+          // return the "updated" answer
+          const answer = new Answer(
+            ans.id,
+            ans.text,
+            ans.name,
+            ans.date,
+            ans.score + 1,
+          );
+          answer.voted = true;
+          return answer;
+        } else return ans;
+      });
+    });
+
+    API.vote(answerId)
+      .then(() => getAnswers())
+      .catch((err) => console.log(err));
+  };
 
   return (
     <>
@@ -16,7 +51,7 @@ function SingleQuestion(props) {
       {question ? (
         <>
           <QuestionDescription question={question} />
-          <Answers answers={answers} voteUp={props.voteUp}></Answers>
+          <Answers answers={answers} voteUp={voteUp}></Answers>
         </>
       ) : (
         <p className="lead">The selected question does not exist!</p>
@@ -44,11 +79,9 @@ function QuestionDescription(props) {
 function QuestionHeader(props) {
   return (
     <>
-      {/* Display the question number */}
       <Col md={6} as="p">
         <strong>Question #{props.questionNum}:</strong>
       </Col>
-      {/* Display the question author */}
       <Col md={6} as="p" className="text-end">
         Asked by{" "}
         <span className="badge rounded-pill text-bg-secondary text-end">
@@ -61,7 +94,6 @@ function QuestionHeader(props) {
 
 function QuestionText(props) {
   return (
-    // Display the question text
     <Col as="p" className="lead">
       {props.text}
     </Col>
