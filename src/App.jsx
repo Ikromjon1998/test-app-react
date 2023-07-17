@@ -1,18 +1,25 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container } from "react-bootstrap";
-import { Question, Answer } from "./QAModels";
+import { Container, Row, Alert } from "react-bootstrap";
 import SingleQuestion from "./components/SingleQuestionComponent";
 import NavHeader from "./components/NavbarComponents";
 import NotFound from "./components/NotFoundComponent";
 import AnswerForm from "./components/AnswerForm";
 import QuestionList from "./components/QuestionListComponent";
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Outlet,
+  Navigate,
+} from "react-router-dom";
 import API from "./API";
+import { LoginForm } from "./components/AuthComponents";
 
 function App() {
   const [questions, setQuestions] = useState([]);
-  const [answers, setAnswers] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     // get all the questions from API
@@ -23,25 +30,29 @@ function App() {
     getQuestions();
   }, []);
 
-  const addAnswer = (answer) => {
-    setAnswers((oldAnswers) => [...oldAnswers, answer]);
+  useEffect(() => {
+    const checkAuth = async () => {
+      await API.getUserInfo(); // we have the user info here
+      setLoggedIn(true);
+    };
+    checkAuth();
+  }, []);
+
+  const handleLogin = async (credentials) => {
+    try {
+      const user = await API.logIn(credentials);
+      setLoggedIn(true);
+      setMessage({ msg: `Welcome, ${user.name}!`, type: "success" });
+    } catch (err) {
+      setMessage({ msg: err, type: "danger" });
+    }
   };
 
-  const updateAnswer = (answer) => {
-    setAnswers((oldAnswer) => {
-      return oldAnswer.map((ans) => {
-        if (ans.id === answer.id) {
-          return new Answer(
-            answer.id,
-            answer.text,
-            answer.name,
-            answer.date,
-            ans.questionId,
-            answer.score,
-          );
-        } else return ans;
-      });
-    });
+  const handleLogout = async () => {
+    await API.logOut();
+    setLoggedIn(false);
+    // clean up everything
+    setMessage("");
   };
 
   return (
@@ -57,8 +68,23 @@ function App() {
         <Route
           element={
             <>
-              <NavHeader questions={questions} />
+              <NavHeader
+                questions={questions}
+                loggedIn={loggedIn}
+                handleLogout={handleLogout}
+              />
               <Container fluid className="mt-3">
+                {message && (
+                  <Row>
+                    <Alert
+                      variant={message.type}
+                      onClose={() => setMessage("")}
+                      dismissible
+                    >
+                      {message.msg}
+                    </Alert>
+                  </Row>
+                )}
                 <Outlet />
               </Container>
             </>
@@ -67,7 +93,9 @@ function App() {
           <Route index element={<QuestionList questions={questions} />} />
           <Route
             path="questions/:questionId"
-            element={<SingleQuestion questions={questions} />}
+            element={
+              <SingleQuestion questions={questions} loggedIn={loggedIn} />
+            }
           />
           <Route
             path="questions/:questionId/addAnswer"
@@ -75,9 +103,19 @@ function App() {
           />
           <Route
             path="questions/:questionId/editAnswer/:answerId"
-            element={<AnswerForm updateAnswer={updateAnswer} />}
+            element={<AnswerForm />}
           />
           <Route path="*" element={<NotFound />} />
+          <Route
+            path="/login"
+            element={
+              loggedIn ? (
+                <Navigate replace to="/" />
+              ) : (
+                <LoginForm login={handleLogin} />
+              )
+            }
+          />
         </Route>
       </Routes>
     </BrowserRouter>

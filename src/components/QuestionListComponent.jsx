@@ -1,5 +1,6 @@
 import { Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import React from "react";
 
 export default function QuestionList(props) {
   return (
